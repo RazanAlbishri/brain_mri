@@ -37,24 +37,24 @@ def load_model_with_fix(model_path):
 
 try:
     model = load_model_with_fix(MODEL_PATH)
-    print("✅ Model successfully loaded and ready for predictions!")
+    print("Model successfully loaded and ready for predictions!")
 
     test_input = np.random.random((1, 224, 224, 3)).astype(np.float32)
     prediction = model.predict(test_input, verbose=0)
     print(f" Model test prediction shape: {prediction.shape}")
 
 except Exception as e:
-    print(f"❌ Failed to load model: {e}")
+    print(f"Failed to load model: {e}")
     raise e
 
-# ✅ Real medical brain tumor classes
+
 class_labels = ["Glioma", "Meningioma", "No Tumor", "Pituitary"]
 print(f"Class labels: {class_labels}")
 
 @app.get("/")
 def home():
     return {
-        "message": "MRI Brain Classifier API is running ✅",
+        "message": "MRI Brain Classifier API is running",
         "status": "healthy",
         "model_loaded": True,
         "endpoints": {
@@ -113,7 +113,6 @@ async def predict(file: UploadFile = File(...)):
         print(f"Prediction error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
-# ✅ Proper entry point for deployment
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
