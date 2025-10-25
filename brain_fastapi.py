@@ -41,7 +41,7 @@ app.add_middleware(
 )
 
 # Load the model
-MODEL_PATH = 'MRI_brain_Model.h5'
+MODEL_PATH = 'MRI_brain_Model_FIXED.h5'
 if not os.path.exists(MODEL_PATH):
     logger.error(f"Model file not found at {MODEL_PATH}")
     raise FileNotFoundError(f"Model file not found at {MODEL_PATH}")
