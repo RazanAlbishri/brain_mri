@@ -4,12 +4,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+
 import numpy as np
 from PIL import Image
 import tensorflow as tf
 import io
 import os
-from tensorflow.keras.applications.densenet import preprocess_input  # ✅ مهم جداً
+from tensorflow.keras.applications.densenet import preprocess_input
 
 # FastAPI app initialization
 app = FastAPI(
@@ -27,18 +28,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Model Path (LOCAL)
+# Model Path
 local_model_path = "brain_model.keras"
 
 if not os.path.exists(local_model_path):
-    raise FileNotFoundError(f"Model file not found at: {local_model_path}")
+    raise FileNotFoundError(f"⚠ Model file not found at: {local_model_path}")
 
 # Load Model
-model = tf.keras.models.load_model(local_model_path)
+model = tf.keras.models.load_model(local_model_path, compile=False)
 
-# Updated Class Names & Display Names
 class_names = ['glioma', 'meningioma', 'notumor', 'pituitary']
-
 display_names = {
     "glioma": "Glioma",
     "meningioma": "Meningioma",
@@ -46,12 +45,12 @@ display_names = {
     "pituitary": "Pituitary"
 }
 
-# Helper Function
+# Preprocess incoming images
 def preprocess_image(image_bytes):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     img = img.resize((224, 224))
     img_array = np.array(img)
-    img_array = preprocess_input(img_array)  # ✅ التصحيح الأساسي
+    img_array = preprocess_input(img_array)  
     img_array = np.expand_dims(img_array, axis=0).astype(np.float32)
     return img_array
 
@@ -66,25 +65,24 @@ async def predict_brain(file: UploadFile = File(...)):
 
     predictions = model.predict(img_array)
     pred_idx = int(np.argmax(predictions))
+
     predicted_raw = class_names[pred_idx]
     predicted_class = display_names[predicted_raw]
     confidence = float(np.max(predictions)) * 100
 
     message = (
-        "No tumor detected"
+        "No tumor detected ✅"
         if predicted_raw == "notumor"
-        else f"Possible {predicted_class} tumor detected — please consult a medical specialist."
+        else f"Possible {predicted_class} tumor detected — please consult a specialist 🔍"
     )
 
-    response = {
+    return JSONResponse(content={
         "prediction": predicted_class,
         "confidence": f"{confidence:.2f}%",
         "message": message
-    }
+    })
 
-    return JSONResponse(content=response)
-
-# Root Test Endpoint
+# Root Endpoint
 @app.get("/")
 def root():
-    return {"message": "Welcome to AI Medical Assistant - Brain MRI Classifier API"}
+    return {"message": "✅ API is running successfully — Brain MRI Classifier"}
