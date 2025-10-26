@@ -82,7 +82,9 @@ async def predict_brain(file: UploadFile = File(...)):
         "message": message
     })
 
-# Root Endpoint
-@app.get("/")
-def root():
-    return {"message": "✅ API is running successfully — Brain MRI Classifier"}
+import os
+import uvicorn
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("brain_fastapi:app", host="0.0.0.0", port=port)
