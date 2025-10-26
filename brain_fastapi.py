@@ -29,7 +29,7 @@ app.add_middleware(
 )
 
 # Model Path
-local_model_path = "brain_model.keras"
+local_model_path = "brain_mri_model.keras"
 
 if not os.path.exists(local_model_path):
     raise FileNotFoundError(f"⚠ Model file not found at: {local_model_path}")
