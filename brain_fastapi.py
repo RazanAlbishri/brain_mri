@@ -4,12 +4,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-
 import numpy as np
 from PIL import Image
 import tensorflow as tf
 import io
 import os
+from tensorflow.keras.applications.densenet import preprocess_input  # ✅ مهم جداً
 
 # FastAPI app initialization
 app = FastAPI(
@@ -50,8 +50,9 @@ display_names = {
 def preprocess_image(image_bytes):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     img = img.resize((224, 224))
-    img_array = np.array(img, dtype=np.float32) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
+    img_array = np.array(img)
+    img_array = preprocess_input(img_array)  # ✅ التصحيح الأساسي
+    img_array = np.expand_dims(img_array, axis=0).astype(np.float32)
     return img_array
 
 # Prediction Endpoint
