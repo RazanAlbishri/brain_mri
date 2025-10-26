@@ -1,3 +1,5 @@
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
