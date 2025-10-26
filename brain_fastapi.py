@@ -35,7 +35,16 @@ if not os.path.exists(local_model_path):
 
 # Load Model
 model = tf.keras.models.load_model(local_model_path)
-class_names = ['Glioma', 'Meningioma', 'No Tumor', 'Pituitary']
+
+# Updated Class Names & Display Names
+class_names = ['glioma', 'meningioma', 'notumor', 'pituitary']
+
+display_names = {
+    "glioma": "Glioma",
+    "meningioma": "Meningioma",
+    "notumor": "No Tumor",
+    "pituitary": "Pituitary"
+}
 
 # Helper Function
 def preprocess_image(image_bytes):
@@ -56,13 +65,14 @@ async def predict_brain(file: UploadFile = File(...)):
 
     predictions = model.predict(img_array)
     pred_idx = int(np.argmax(predictions))
-    predicted_class = class_names[pred_idx]
+    predicted_raw = class_names[pred_idx]
+    predicted_class = display_names[predicted_raw]
     confidence = float(np.max(predictions)) * 100
 
     message = (
         "No tumor detected"
-        if predicted_class == "No Tumor"
-        else f"Possible {predicted_class} tumor detected - Please consult a medical specialist."
+        if predicted_raw == "notumor"
+        else f"Possible {predicted_class} tumor detected — please consult a medical specialist."
     )
 
     response = {
